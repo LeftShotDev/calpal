@@ -15,7 +15,7 @@ const log = logger.getSubLogger({ prefix: ["lib/email/notifications"] });
  * @param emailInstance - Instance of BaseEmail subclass
  * @internal - Will be used when email templates are implemented
  */
- 
+
 async function _sendEmail(emailInstance: BaseEmail): Promise<void> {
 	try {
 		await emailInstance.sendEmail();
