@@ -61,8 +61,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T018 [P] [US1] Create BookingService in packages/features/bookings/services/BookingService.ts with methods: createPendingBooking, approveBooking, rejectBooking, getBookingsByUser
-- [ ] T019 [P] [US1] Create AvailabilityService in packages/features/availability/services/AvailabilityService.ts with method: calculateAvailableSlots (combines availability blocks + calendar events + bookings)
+- [x] T018 [P] [US1] Create BookingService in packages/features/bookings/services/MinimalBookingService.ts with methods: createPendingBooking, approveBooking, rejectBooking, getBookingsByUser
+- [x] T019 [P] [US1] Create AvailabilityService in packages/features/availability/services/MinimalAvailabilityService.ts with method: calculateAvailableSlots (combines availability blocks + calendar events + bookings)
 - [ ] T020 [US1] Create public.booking.getAvailability tRPC procedure in packages/trpc/server/routers/public/booking.ts (depends on T019)
 - [ ] T021 [US1] Create public.booking.createBooking tRPC procedure in packages/trpc/server/routers/public/booking.ts with rate limiting, validation, double-booking prevention (depends on T018, T019)
 - [ ] T022 [US1] Create bookings.approve tRPC procedure in packages/trpc/server/routers/bookings.ts for admin approval (depends on T018)
