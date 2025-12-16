@@ -22,12 +22,12 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Verify existing Cal.com monorepo structure and dependencies
-- [ ] T002 [P] Review and document current Prisma schema in packages/prisma/schema.prisma
-- [ ] T003 [P] Review existing tRPC router structure in packages/trpc/server/routers/
-- [ ] T004 [P] Review existing UI component structure in packages/ui/components/
-- [ ] T005 [P] Review existing Next.js App Router structure in apps/web/app/
-- [ ] T006 Identify and document non-core features to be removed (workflows, payments, teams, etc.)
+- [x] T001 Verify existing Cal.com monorepo structure and dependencies
+- [x] T002 [P] Review and document current Prisma schema in packages/prisma/schema.prisma
+- [x] T003 [P] Review existing tRPC router structure in packages/trpc/server/routers/
+- [x] T004 [P] Review existing UI component structure in packages/ui/components/
+- [x] T005 [P] Review existing Next.js App Router structure in apps/web/app/
+- [x] T006 Identify and document non-core features to be removed (workflows, payments, teams, etc.)
 
 ---
 
