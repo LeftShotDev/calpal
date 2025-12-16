@@ -13,6 +13,14 @@ import { ZInstantBookingInputSchema } from "./getInstantBookingLocation.schema";
 import { ZReportBookingInputSchema } from "./reportBooking.schema";
 import { ZRequestRescheduleInputSchema } from "./requestReschedule.schema";
 import { bookingsProcedure } from "./util";
+import {
+	ZListBookingsInputSchema,
+	ZApproveBookingInputSchema,
+	ZRejectBookingInputSchema,
+	listBookingsHandler,
+	approveBookingHandler,
+	rejectBookingHandler,
+} from "./minimalScheduler";
 
 export const bookingsRouter = router({
   get: authedProcedure.input(ZGetInputSchema).query(async ({ input, ctx }) => {
@@ -115,5 +123,18 @@ export const bookingsRouter = router({
       ctx,
       input,
     });
+  }),
+
+  // Minimal scheduler procedures
+  list: authedProcedure.input(ZListBookingsInputSchema).query(async ({ input, ctx }) => {
+    return listBookingsHandler({ ctx, input });
+  }),
+
+  approve: authedProcedure.input(ZApproveBookingInputSchema).mutation(async ({ input, ctx }) => {
+    return approveBookingHandler({ ctx, input });
+  }),
+
+  reject: authedProcedure.input(ZRejectBookingInputSchema).mutation(async ({ input, ctx }) => {
+    return rejectBookingHandler({ ctx, input });
   }),
 });

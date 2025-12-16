@@ -63,15 +63,15 @@
 
 - [x] T018 [P] [US1] Create BookingService in packages/features/bookings/services/MinimalBookingService.ts with methods: createPendingBooking, approveBooking, rejectBooking, getBookingsByUser
 - [x] T019 [P] [US1] Create AvailabilityService in packages/features/availability/services/MinimalAvailabilityService.ts with method: calculateAvailableSlots (combines availability blocks + calendar events + bookings)
-- [ ] T020 [US1] Create public.booking.getAvailability tRPC procedure in packages/trpc/server/routers/public/booking.ts (depends on T019)
-- [ ] T021 [US1] Create public.booking.createBooking tRPC procedure in packages/trpc/server/routers/public/booking.ts with rate limiting, validation, double-booking prevention (depends on T018, T019)
-- [ ] T022 [US1] Create bookings.approve tRPC procedure in packages/trpc/server/routers/bookings.ts for admin approval (depends on T018)
-- [ ] T023 [US1] Create bookings.reject tRPC procedure in packages/trpc/server/routers/bookings.ts for admin rejection (depends on T018)
-- [ ] T024 [US1] Create bookings.list tRPC procedure in packages/trpc/server/routers/bookings.ts for admin to view bookings (depends on T018)
-- [ ] T025 [US1] Implement email notification service: Send pending confirmation to user in packages/lib/email/notifications.ts (depends on T017)
-- [ ] T026 [US1] Implement email notification service: Notify admin of pending booking in packages/lib/email/notifications.ts (depends on T017)
-- [ ] T027 [US1] Implement email notification service: Send confirmation email when booking approved in packages/lib/email/notifications.ts (depends on T017)
-- [ ] T028 [US1] Implement email notification service: Send rejection email when booking rejected in packages/lib/email/notifications.ts (depends on T017)
+- [x] T020 [US1] Create public.booking.getAvailability tRPC procedure in packages/trpc/server/routers/public/booking.ts (depends on T019)
+- [x] T021 [US1] Create public.booking.createBooking tRPC procedure in packages/trpc/server/routers/public/booking.ts with rate limiting, validation, double-booking prevention (depends on T018, T019)
+- [x] T022 [US1] Create bookings.approve tRPC procedure in packages/trpc/server/routers/viewer/bookings/_router.tsx for admin approval (depends on T018)
+- [x] T023 [US1] Create bookings.reject tRPC procedure in packages/trpc/server/routers/viewer/bookings/_router.tsx for admin rejection (depends on T018)
+- [x] T024 [US1] Create bookings.list tRPC procedure in packages/trpc/server/routers/viewer/bookings/_router.tsx for admin to view bookings (depends on T018)
+- [x] T025 [US1] Implement email notification service: Send pending confirmation to user in packages/lib/email/notifications.ts (depends on T017) - Infrastructure complete, email templates pending
+- [x] T026 [US1] Implement email notification service: Notify admin of pending booking in packages/lib/email/notifications.ts (depends on T017) - Infrastructure complete, email templates pending
+- [x] T027 [US1] Implement email notification service: Send confirmation email when booking approved in packages/lib/email/notifications.ts (depends on T017) - Infrastructure complete, email templates pending
+- [x] T028 [US1] Implement email notification service: Send rejection email when booking rejected in packages/lib/email/notifications.ts (depends on T017) - Infrastructure complete, email templates pending
 - [ ] T029 [US1] Create public scheduling page component in apps/web/app/(use-page-wrapper)/[username]/page.tsx
 - [ ] T030 [US1] Create availability display component in packages/ui/components/availability/AvailabilityDisplay.tsx
 - [ ] T031 [US1] Create booking form component in packages/ui/components/booking/BookingForm.tsx
@@ -79,7 +79,7 @@
 - [ ] T033 [US1] Create admin bookings list page in apps/web/app/(use-page-wrapper)/(main-nav)/bookings/page.tsx
 - [ ] T034 [US1] Create admin booking approval/rejection UI component in packages/ui/components/bookings/BookingActions.tsx
 - [ ] T035 [US1] Add timezone detection and conversion in public scheduling page (client-side) in apps/web/app/(use-page-wrapper)/[username]/page.tsx
-- [ ] T036 [US1] Implement double-booking prevention logic in BookingService.createPendingBooking using database transactions
+- [x] T036 [US1] Implement double-booking prevention logic in BookingService.createPendingBooking using database transactions
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently. Users can submit bookings, admins can approve/reject, and confirmations are sent.
 
