@@ -25,7 +25,7 @@ Represents a scheduled meeting between a user and admin.
 - `notes` (string, optional) - Optional meeting notes from attendee
 - `videoProvider` (enum: 'google-meet' | 'zoom' | null) - Selected video platform
 - `videoLink` (string, optional) - Video conferencing link (Google Meet or Zoom)
-- `status` (enum: 'confirmed' | 'cancelled') - Booking status
+- `status` (enum: 'pending' | 'confirmed' | 'rejected' | 'cancelled') - Booking status
 - `timezone` (string) - Timezone of the booking (e.g., "America/New_York")
 - `calendarEventId` (string, optional) - Google Calendar event ID if synced
 - `createdAt` (DateTime, UTC)
@@ -43,7 +43,10 @@ Represents a scheduled meeting between a user and admin.
 - `timezone` MUST be valid IANA timezone identifier
 
 **State Transitions**:
+- `pending` → `confirmed` (admin approves booking)
+- `pending` → `rejected` (admin rejects booking)
 - `confirmed` → `cancelled` (admin or system can cancel)
+- `rejected` → (terminal state, cannot be reactivated)
 - `cancelled` → (terminal state, cannot be reactivated)
 
 **Indexes**:
@@ -262,7 +265,7 @@ User
 
 ### Booking Creation Rules
 1. `startTime` MUST fall within an active `AvailabilityBlock`
-2. `startTime` MUST NOT overlap with existing `Booking` (status: 'confirmed')
+2. `startTime` MUST NOT overlap with existing `Booking` (status: 'pending' | 'confirmed') - pending bookings reserve time slots
 3. `startTime` MUST NOT overlap with `CalendarEvent` (isBusy: true)
 4. `startTime` MUST be in the future (cannot book past times)
 5. Minimum booking duration: 15 minutes

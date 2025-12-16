@@ -82,8 +82,7 @@ Create a new booking (public, no auth required).
 ```typescript
 {
   bookingId: string;         // UUID
-  status: 'confirmed';
-  videoLink?: string;        // If videoProvider was selected
+  status: 'pending';         // Bookings start in pending state, awaiting admin approval
   confirmationMessage: string;
 }
 ```
@@ -95,11 +94,12 @@ Create a new booking (public, no auth required).
 - `INTERNAL_SERVER_ERROR`: Video link generation failed (booking still created)
 
 **Business Logic**:
-- Validates time slot is available
-- Creates booking atomically (prevents double-booking)
-- Generates video link if videoProvider specified
-- Creates calendar event in admin's Google Calendar
-- Sends confirmation email to attendee
+- Validates time slot is available (checks against pending and confirmed bookings)
+- Creates booking atomically with status 'pending' (prevents double-booking)
+- Sends pending confirmation email to attendee
+- Notifies admin of pending booking requiring approval
+- Does NOT create calendar event (only created on approval per FR-008)
+- Does NOT send final confirmation email (only sent on approval per FR-007)
 
 ---
 
@@ -227,7 +227,7 @@ Get all bookings for authenticated admin.
 {
   startDate?: string;        // Optional: ISO date string
   endDate?: string;          // Optional: ISO date string
-  status?: 'confirmed' | 'cancelled';
+  status?: 'pending' | 'confirmed' | 'rejected' | 'cancelled';
 }
 ```
 
@@ -243,7 +243,7 @@ Get all bookings for authenticated admin.
     notes?: string;
     videoProvider?: 'google-meet' | 'zoom';
     videoLink?: string;
-    status: 'confirmed' | 'cancelled';
+    status: 'pending' | 'confirmed' | 'rejected' | 'cancelled';
     timezone: string;
   }>;
 }
@@ -305,6 +305,82 @@ Cancel a booking.
 **Errors**:
 - `NOT_FOUND`: Booking not found or not owned by user
 - `BAD_REQUEST`: Booking already cancelled
+- `UNAUTHORIZED`: Not authenticated
+
+---
+
+### `approve`
+
+Approve a pending booking. This transitions the booking from 'pending' to 'confirmed' and creates the calendar event.
+
+**Input** (Zod schema):
+```typescript
+{
+  id: string;                // Booking ID
+}
+```
+
+**Output**:
+```typescript
+{
+  id: string;
+  status: 'confirmed';
+  calendarEventId?: string;  // Google Calendar event ID if created
+  videoLink?: string;        // Video link if videoProvider was selected
+}
+```
+
+**Auth**: Required (admin only)
+
+**Business Logic**:
+- Validates booking exists and is in 'pending' status
+- Updates booking status to 'confirmed'
+- Generates video link if videoProvider specified (Google Meet or Zoom)
+- Creates calendar event in admin's Google Calendar (per FR-008)
+- Sends confirmation email to attendee (per FR-007)
+- Updates availability to reflect confirmed booking
+
+**Errors**:
+- `NOT_FOUND`: Booking not found or not owned by user
+- `BAD_REQUEST`: Booking is not in 'pending' status
+- `UNAUTHORIZED`: Not authenticated
+- `INTERNAL_SERVER_ERROR`: Calendar event creation failed (booking still confirmed)
+
+---
+
+### `reject`
+
+Reject a pending booking. This transitions the booking from 'pending' to 'rejected'.
+
+**Input** (Zod schema):
+```typescript
+{
+  id: string;                // Booking ID
+  reason?: string;           // Optional rejection reason
+}
+```
+
+**Output**:
+```typescript
+{
+  id: string;
+  status: 'rejected';
+  rejectionReason?: string;
+}
+```
+
+**Auth**: Required (admin only)
+
+**Business Logic**:
+- Validates booking exists and is in 'pending' status
+- Updates booking status to 'rejected'
+- Stores rejection reason if provided
+- Sends rejection email to attendee
+- Releases time slot for other bookings
+
+**Errors**:
+- `NOT_FOUND`: Booking not found or not owned by user
+- `BAD_REQUEST`: Booking is not in 'pending' status
 - `UNAUTHORIZED`: Not authenticated
 
 ---
