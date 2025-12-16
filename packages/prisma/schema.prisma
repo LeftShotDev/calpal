@@ -367,55 +367,58 @@ model TravelSchedule {
 
 // It holds Personal Profiles of a User plus it has email, password and other core things..
 model User {
-  id                  Int                  @id @default(autoincrement())
-  uuid                String               @unique @default(uuid()) @db.Uuid
-  username            String?
-  name                String?
+  id                   Int                   @id @default(autoincrement())
+  uuid                 String                @unique @default(uuid()) @db.Uuid
+  username             String?
+  name                 String?
   /// @zod.import(["import { emailSchema } from '../../zod-utils'"]).custom.use(emailSchema)
-  email               String
-  emailVerified       DateTime?
-  password            UserPassword?
-  bio                 String?
-  avatarUrl           String?
-  timeZone            String               @default("Europe/London")
-  travelSchedules     TravelSchedule[]
-  weekStart           String               @default("Sunday")
+  email                String
+  emailVerified        DateTime?
+  password             UserPassword?
+  bio                  String?
+  avatarUrl            String?
+  timeZone             String                @default("Europe/London")
+  travelSchedules      TravelSchedule[]
+  weekStart            String                @default("Sunday")
   // DEPRECATED - TO BE REMOVED
-  startTime           Int                  @default(0)
-  endTime             Int                  @default(1440)
+  startTime            Int                   @default(0)
+  endTime              Int                   @default(1440)
   // </DEPRECATED>
-  bufferTime          Int                  @default(0)
-  hideBranding        Boolean              @default(false)
+  bufferTime           Int                   @default(0)
+  hideBranding         Boolean               @default(false)
   // TODO: should be renamed since it only affects the booking page
-  theme               String?
-  appTheme            String?
-  createdDate         DateTime             @default(now()) @map(name: "created")
-  trialEndsAt         DateTime?
-  lastActiveAt        DateTime?
-  eventTypes          EventType[]          @relation("user_eventtype")
-  credentials         Credential[]
-  teams               Membership[]
-  bookings            Booking[]
-  schedules           Schedule[]
-  defaultScheduleId   Int?
-  selectedCalendars   SelectedCalendar[]
-  completedOnboarding Boolean              @default(false)
-  locale              String?
-  timeFormat          Int?                 @default(12)
-  twoFactorSecret     String?
-  twoFactorEnabled    Boolean              @default(false)
-  backupCodes         String?
-  identityProvider    IdentityProvider     @default(CAL)
-  identityProviderId  String?
-  availability        Availability[]
-  invitedTo           Int?
-  webhooks            Webhook[]
-  brandColor          String?
-  darkBrandColor      String?
+  theme                String?
+  appTheme             String?
+  createdDate          DateTime              @default(now()) @map(name: "created")
+  trialEndsAt          DateTime?
+  lastActiveAt         DateTime?
+  eventTypes           EventType[]           @relation("user_eventtype")
+  credentials          Credential[]
+  teams                Membership[]
+  bookings             Booking[]
+  schedules            Schedule[]
+  defaultScheduleId    Int?
+  selectedCalendars    SelectedCalendar[]
+  // Minimal scheduler relations
+  availabilityBlocks   AvailabilityBlock[]
+  calendarIntegrations CalendarIntegration[]
+  completedOnboarding  Boolean               @default(false)
+  locale               String?
+  timeFormat           Int?                  @default(12)
+  twoFactorSecret      String?
+  twoFactorEnabled     Boolean               @default(false)
+  backupCodes          String?
+  identityProvider     IdentityProvider      @default(CAL)
+  identityProviderId   String?
+  availability         Availability[]
+  invitedTo            Int?
+  webhooks             Webhook[]
+  brandColor           String?
+  darkBrandColor       String?
   // the location where the events will end up
-  destinationCalendar DestinationCalendar?
+  destinationCalendar  DestinationCalendar?
   // participate in dynamic group booking or not
-  allowDynamicBooking Boolean?             @default(true)
+  allowDynamicBooking  Boolean?              @default(true)
 
   // participate in SEO indexing or not
   allowSEOIndexing Boolean? @default(true)
@@ -815,6 +818,7 @@ model Attendee {
 enum BookingStatus {
   CANCELLED     @map("cancelled")
   ACCEPTED      @map("accepted")
+  CONFIRMED     @map("confirmed") // Added for minimal scheduler: booking approved by admin
   REJECTED      @map("rejected")
   PENDING       @map("pending")
   AWAITING_HOST @map("awaiting_host")
@@ -844,11 +848,18 @@ model Booking {
   location                     String?
   createdAt                    DateTime                          @default(now())
   updatedAt                    DateTime?                         @updatedAt
-  status                       BookingStatus                     @default(ACCEPTED)
+  status                       BookingStatus                     @default(PENDING) // Changed to PENDING for admin approval workflow
   paid                         Boolean                           @default(false)
   payment                      Payment[]
   destinationCalendar          DestinationCalendar?              @relation(fields: [destinationCalendarId], references: [id])
   destinationCalendarId        Int?
+  // Minimal scheduler fields
+  attendeeName                 String? // Name of person booking (simplified from Attendee model)
+  attendeeEmail                String? // Email of person booking (simplified from Attendee model)
+  videoProvider                String? // 'google-meet' | 'zoom' | null
+  videoLink                    String? // Video conferencing link
+  timezone                     String? // IANA timezone identifier for booking
+  calendarEventId              String? // Google Calendar event ID if synced
   cancellationReason           String?
   rejectionReason              String?
   reassignReason               String?
@@ -898,6 +909,67 @@ model Booking {
   @@index([status])
   @@index([startTime, endTime, status])
   @@index([fromReschedule])
+  // Minimal scheduler indexes
+  @@index([userId, startTime]) // For querying admin's bookings
+  @@index([startTime, endTime]) // For availability calculations
+}
+
+// Minimal scheduler models
+
+model AvailabilityBlock {
+  id        String   @id @default(uuid()) @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  dayOfWeek Int // 0=Sunday, 6=Saturday
+  startTime DateTime @db.Time
+  endTime   DateTime @db.Time
+  timezone  String // IANA timezone identifier
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, dayOfWeek]) // For querying admin's availability by day
+  @@index([userId, isActive]) // For filtering active blocks
+}
+
+model CalendarIntegration {
+  id             String          @id @default(uuid()) @db.Uuid
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         Int
+  type           String          @default("google-calendar") // Only 'google-calendar' supported
+  accessToken    String // Encrypted OAuth access token
+  refreshToken   String? // Encrypted OAuth refresh token
+  tokenExpiresAt DateTime?
+  calendarId     String          @default("primary") // Google Calendar ID
+  syncToken      String? // Google Calendar sync token for incremental sync
+  lastSyncAt     DateTime?
+  syncStatus     String          @default("disconnected") // 'active' | 'error' | 'disconnected'
+  syncError      String?
+  calendarEvents CalendarEvent[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@unique([userId, type]) // One integration per type per user
+  @@index([userId, type]) // For querying admin's calendar integrations
+  @@index([syncStatus]) // For finding integrations needing sync
+}
+
+model CalendarEvent {
+  id                    String              @id @default(uuid()) @db.Uuid
+  calendarIntegration   CalendarIntegration @relation(fields: [calendarIntegrationId], references: [id], onDelete: Cascade)
+  calendarIntegrationId String              @db.Uuid
+  externalEventId       String // Event ID from external calendar (e.g., Google Calendar)
+  startTime             DateTime // Event start time in UTC
+  endTime               DateTime // Event end time in UTC
+  title                 String?
+  isBusy                Boolean             @default(true) // Whether this event marks time as busy
+  syncedAt              DateTime            @default(now())
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  @@unique([calendarIntegrationId, externalEventId]) // Unique per integration
+  @@index([calendarIntegrationId, startTime]) // For querying events by integration and time
+  @@index([startTime, endTime]) // For availability overlap queries
 }
 
 model Tracking {
