@@ -20,8 +20,9 @@ A user visits a scheduling page and selects an available time slot to book a mee
 1. **Given** an admin has configured availability blocks and connected their Google Calendar, **When** a user visits the scheduling page, **Then** the user sees available time slots displayed in their local timezone
 2. **Given** a user is viewing available time slots, **When** the user selects an available time slot, **Then** the user is presented with a booking form
 3. **Given** a user is filling out the booking form, **When** the user provides name, email, and optional meeting notes, **Then** the user can submit the booking
-4. **Given** a user submits a booking, **When** the booking is confirmed, **Then** the user receives a confirmation message and the meeting appears in the admin's calendar
-5. **Given** a user selects a time slot that becomes unavailable (e.g., admin books it directly), **When** the user attempts to book, **Then** the user is notified the slot is no longer available and shown updated availability
+4. **Given** a user submits a booking, **When** the booking is submitted, **Then** the user receives a pending confirmation message and the admin is notified of the pending booking
+5. **Given** an admin has a pending booking, **When** the admin approves the booking, **Then** the booking is confirmed, the user receives a confirmation email, and the meeting appears in the admin's calendar
+6. **Given** a user selects a time slot that becomes unavailable (e.g., admin books it directly), **When** the user attempts to book, **Then** the user is notified the slot is no longer available and shown updated availability
 
 ---
 
@@ -91,6 +92,21 @@ When scheduling a meeting, users can select Google Meet or Zoom as the video con
 - What happens when Google Calendar OAuth token expires? (System should prompt admin to reconnect)
 - How does the system handle multiple admins or team scenarios? (Out of scope for MVP - single admin only)
 - What happens when video conferencing platform API is unavailable? (Booking should complete without video link, with notification to admin)
+- What happens when a user exceeds rate limit? (System returns 429 Too Many Requests error with retry-after header, user must wait before booking again)
+- What happens when admin rejects a pending booking? (User receives rejection notification, time slot becomes available again, booking marked as rejected)
+- What happens if admin doesn't approve/reject a pending booking? (Pending bookings remain pending indefinitely until admin manually approves or rejects them; no automatic expiration)
+- How long do pending bookings reserve time slots? (Pending bookings reserve slots until approved/rejected, preventing other users from booking same time; slots remain reserved until manual admin action)
+- What happens to booking data after 1 year? (System automatically deletes booking records older than 1 year, including associated calendar events and video links)
+
+## Clarifications
+
+### Session 2025-12-16
+
+- Q: What rate limiting should be applied to the public booking endpoint? → A: Moderate rate limiting (10 bookings per IP per hour)
+- Q: What email service should be used for booking confirmations? → A: Use existing Cal.com email infrastructure (SMTP/Resend/SendGrid)
+- Q: Should bookings be immediately confirmed or require admin approval? → A: Admin approval required (booking pending until admin approves)
+- Q: How long should booking data be retained? → A: Retain bookings for 1 year, then delete
+- Q: What happens if admin doesn't approve/reject a pending booking? → A: No expiration (pending until manually handled)
 
 ## Requirements *(mandatory)*
 
@@ -98,28 +114,33 @@ When scheduling a meeting, users can select Google Meet or Zoom as the video con
 
 - **FR-001**: System MUST allow users to view available time slots for scheduling without authentication
 - **FR-002**: System MUST display available time slots in the user's local timezone, automatically detected or manually selected
-- **FR-003**: System MUST allow users to select an available time slot and provide name, email, and optional meeting notes to book a meeting
-- **FR-004**: System MUST send booking confirmation to users via email upon successful booking
-- **FR-005**: System MUST create calendar events in the admin's connected Google Calendar for all confirmed bookings
-- **FR-006**: System MUST support Google Calendar integration via OAuth2 authentication
-- **FR-007**: System MUST sync calendar events from connected Google Calendar to determine real-time availability
-- **FR-008**: System MUST allow admins to connect and disconnect Google Calendar integrations
-- **FR-009**: System MUST allow admins to create, edit, and delete availability blocks with day of week, time range, and timezone settings
-- **FR-010**: System MUST use availability blocks in combination with calendar events to determine available time slots
-- **FR-011**: System MUST support Google Meet video conferencing integration
-- **FR-012**: System MUST support Zoom video conferencing integration
-- **FR-013**: System MUST allow users to select video conferencing platform (Google Meet or Zoom) when scheduling
-- **FR-014**: System MUST generate and include video conferencing links in booking confirmations and calendar events
-- **FR-015**: System MUST prevent double-booking of the same time slot
-- **FR-016**: System MUST update availability in real-time as bookings are made
-- **FR-017**: System MUST handle timezone conversions automatically for all scheduling operations
-- **FR-018**: System MUST remove all features not essential to core scheduling functionality (workflows, resource scheduling, advanced notifications, etc.)
-- **FR-019**: System MUST provide a simplified, performant user interface compared to the original Cal.com application
-- **FR-020**: System MUST optimize backend synchronization to avoid query loops and improve performance
+- **FR-003**: System MUST allow users to select an available time slot and provide name, email, and optional meeting notes to submit a booking request
+- **FR-004**: System MUST send pending confirmation notification to users via email upon booking submission using existing Cal.com email infrastructure (SMTP/Resend/SendGrid)
+- **FR-005**: System MUST notify admin of pending bookings requiring approval
+- **FR-006**: System MUST allow admins to approve or reject pending bookings
+- **FR-007**: System MUST send booking confirmation email to users when admin approves booking
+- **FR-008**: System MUST create calendar events in the admin's connected Google Calendar only for approved bookings
+- **FR-009**: System MUST support Google Calendar integration via OAuth2 authentication
+- **FR-010**: System MUST sync calendar events from connected Google Calendar to determine real-time availability
+- **FR-011**: System MUST allow admins to connect and disconnect Google Calendar integrations
+- **FR-012**: System MUST allow admins to create, edit, and delete availability blocks with day of week, time range, and timezone settings
+- **FR-013**: System MUST use availability blocks in combination with calendar events to determine available time slots
+- **FR-014**: System MUST support Google Meet video conferencing integration
+- **FR-015**: System MUST support Zoom video conferencing integration
+- **FR-016**: System MUST allow users to select video conferencing platform (Google Meet or Zoom) when scheduling
+- **FR-017**: System MUST generate and include video conferencing links in booking confirmations and calendar events (only for approved bookings)
+- **FR-018**: System MUST prevent double-booking of the same time slot (including pending bookings)
+- **FR-019**: System MUST update availability in real-time as bookings are made (pending bookings reserve time slots)
+- **FR-020**: System MUST handle timezone conversions automatically for all scheduling operations
+- **FR-021**: System MUST remove all features not essential to core scheduling functionality (workflows, resource scheduling, advanced notifications, etc.)
+- **FR-022**: System MUST provide a simplified, performant user interface compared to the original Cal.com application
+- **FR-023**: System MUST optimize backend synchronization to avoid query loops and improve performance
+- **FR-024**: System MUST implement rate limiting for public booking creation (10 bookings per IP address per hour) to prevent abuse
+- **FR-025**: System MUST automatically delete booking records older than 1 year to comply with data retention policy
 
 ### Key Entities *(include if feature involves data)*
 
-- **Booking**: Represents a scheduled meeting between a user and admin. Contains: user name, email, meeting time, duration, optional notes, video conferencing link (if selected), status (confirmed/cancelled), timezone information
+- **Booking**: Represents a scheduled meeting between a user and admin. Contains: user name, email, meeting time, duration, optional notes, video conferencing link (if selected), status (pending/confirmed/rejected/cancelled), timezone information
 - **Availability Block**: Represents admin-defined time periods when meetings can be scheduled. Contains: day(s) of week, start time, end time, timezone, active status
 - **Calendar Integration**: Represents connection between admin's external calendar and the scheduling system. Contains: provider type (Google Calendar), OAuth token, sync status, last sync timestamp
 - **Time Slot**: Represents a discrete time period available for booking. Derived from availability blocks minus calendar events. Contains: start time, end time, timezone, availability status
