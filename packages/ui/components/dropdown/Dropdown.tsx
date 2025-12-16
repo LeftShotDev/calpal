@@ -74,13 +74,24 @@ export const DropdownMenuLabel = (props: DropdownMenuLabelProps) => (
 
 type DropdownMenuItemProps = ComponentProps<(typeof DropdownMenuPrimitive)["CheckboxItem"]>;
 export const DropdownMenuItem = forwardRef<HTMLDivElement, DropdownMenuItemProps>(
-  ({ className = "", ...props }, forwardedRef) => (
-    <DropdownMenuPrimitive.Item
-      className={`hover:bg-subtle hover:text-emphasis text-default text-sm ring-inset first-of-type:rounded-t-[inherit] last-of-type:rounded-b-[inherit] hover:ring-0 focus:outline-none focus:bg-subtle focus:text-emphasis ${className}`}
-      {...props}
-      ref={forwardedRef}
-    />
-  )
+  ({ className = "", children, ...props }, forwardedRef) => {
+    // React 19 compatibility: Clone children to ensure refs are handled as props
+    // Radix UI internally accesses element.ref which is deprecated in React 19
+    const clonedChildren = React.isValidElement(children)
+      ? React.cloneElement(children as React.ReactElement, {
+          ...(children as React.ReactElement).props,
+        })
+      : children;
+
+    return (
+      <DropdownMenuPrimitive.Item
+        className={`hover:bg-subtle hover:text-emphasis text-default text-sm ring-inset first-of-type:rounded-t-[inherit] last-of-type:rounded-b-[inherit] hover:ring-0 focus:outline-none focus:bg-subtle focus:text-emphasis ${className}`}
+        {...props}
+        ref={forwardedRef}>
+        {clonedChildren}
+      </DropdownMenuPrimitive.Item>
+    );
+  }
 );
 DropdownMenuItem.displayName = "DropdownMenuItem";
 
@@ -89,6 +100,24 @@ export const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 type DropdownMenuCheckboxItemProps = ComponentProps<(typeof DropdownMenuPrimitive)["CheckboxItem"]>;
 export const DropdownMenuCheckboxItem = forwardRef<HTMLDivElement, DropdownMenuCheckboxItemProps>(
   ({ children, checked, onCheckedChange, ...props }, forwardedRef) => {
+    // React 19 compatibility: Clone the input element for ItemIndicator to ensure refs are handled correctly
+    const indicatorInput = (
+      <input
+        aria-disabled={true}
+        aria-readonly
+        aria-label={typeof children === "string" ? `Active ${children}` : undefined}
+        checked={true}
+        type="checkbox"
+        className="text-emphasis dark:text-muted focus:ring-emphasis border-default bg-default h-4 w-4 rounded transition hover:cursor-pointer"
+      />
+    );
+
+    const clonedIndicatorInput = React.isValidElement(indicatorInput)
+      ? React.cloneElement(indicatorInput as React.ReactElement, {
+          ...(indicatorInput as React.ReactElement).props,
+        })
+      : indicatorInput;
+
     return (
       <DropdownMenuPrimitive.CheckboxItem
         {...props}
@@ -108,14 +137,7 @@ export const DropdownMenuCheckboxItem = forwardRef<HTMLDivElement, DropdownMenuC
           />
         )}
         <DropdownMenuPrimitive.ItemIndicator asChild>
-          <input
-            aria-disabled={true}
-            aria-readonly
-            aria-label={typeof children === "string" ? `Active ${children}` : undefined}
-            checked={true}
-            type="checkbox"
-            className="text-emphasis dark:text-muted focus:ring-emphasis border-default bg-default h-4 w-4 rounded transition hover:cursor-pointer"
-          />
+          {clonedIndicatorInput}
         </DropdownMenuPrimitive.ItemIndicator>
       </DropdownMenuPrimitive.CheckboxItem>
     );
