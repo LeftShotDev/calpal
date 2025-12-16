@@ -42,10 +42,11 @@ export function Tooltip({
 
 	// React 19 compatibility workaround for Radix UI's asChild prop
 	// Radix UI internally accesses element.ref which is deprecated in React 19
-	// By cloning the element, we ensure ref is handled as a prop rather than accessed via element.ref
+	// We clone the element to ensure refs are handled as props rather than accessed via element.ref
 	const triggerElement = React.isValidElement(children)
 		? React.cloneElement(children as React.ReactElement, {
-			// Clone element with existing props to ensure React 19 compatibility
+			// Spread existing props to ensure React 19 compatibility
+			// This ensures ref is handled as a prop, not accessed via the deprecated element.ref
 			...(children as React.ReactElement).props,
 		})
 		: children;
