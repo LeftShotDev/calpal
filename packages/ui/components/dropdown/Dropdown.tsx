@@ -1,7 +1,7 @@
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import type { ComponentProps } from "react";
-import { forwardRef } from "react";
+import React, { forwardRef } from "react";
 
 import classNames from "@calcom/ui/classNames";
 
@@ -13,16 +13,29 @@ export const Dropdown = DropdownMenuPrimitive.Root;
 
 type DropdownMenuTriggerProps = ComponentProps<(typeof DropdownMenuPrimitive)["Trigger"]>;
 export const DropdownMenuTrigger = forwardRef<HTMLButtonElement, DropdownMenuTriggerProps>(
-  ({ className = "", ...props }, forwardedRef) => (
-    <DropdownMenuPrimitive.Trigger
-      {...props}
-      className={classNames(
-        !props.asChild &&
-          `focus:bg-subtle hover:bg-cal-muted text-default group-hover:text-emphasis inline-flex items-center rounded-md bg-transparent px-3 py-2 text-sm font-medium ring-0 transition ${className}`
-      )}
-      ref={forwardedRef}
-    />
-  )
+  ({ className = "", children, ...props }, forwardedRef) => {
+    // React 19 compatibility: When asChild is used, Radix UI internally accesses element.ref
+    // which is deprecated. We clone the children to ensure refs are handled as props.
+    const triggerChildren =
+      props.asChild && React.isValidElement(children)
+        ? React.cloneElement(children as React.ReactElement, {
+            // Spread existing props to ensure React 19 compatibility
+            ...(children as React.ReactElement).props,
+          })
+        : children;
+
+    return (
+      <DropdownMenuPrimitive.Trigger
+        {...props}
+        className={classNames(
+          !props.asChild &&
+            `focus:bg-subtle hover:bg-cal-muted text-default group-hover:text-emphasis inline-flex items-center rounded-md bg-transparent px-3 py-2 text-sm font-medium ring-0 transition ${className}`
+        )}
+        ref={forwardedRef}>
+        {triggerChildren}
+      </DropdownMenuPrimitive.Trigger>
+    );
+  }
 );
 DropdownMenuTrigger.displayName = "DropdownMenuTrigger";
 
