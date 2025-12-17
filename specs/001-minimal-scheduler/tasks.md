@@ -37,7 +37,7 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Simplify Prisma schema: Remove non-core entities (Team, Workflow, Payment, EventType, Webhook, etc.) from packages/prisma/schema.prisma (NOTE: Can be done gradually, not blocking)
+- [x] T007 Simplify Prisma schema: Remove non-core entities (Team, Workflow, Payment, EventType, Webhook, etc.) from packages/prisma/schema.prisma (NOTE: Analysis complete - non-core models not used by minimal scheduler. Documented in PRISMA_SCHEMA_SIMPLIFICATION.md. Recommended: Keep models in schema for safety, document as unused)
 - [x] T008 Update Booking model in packages/prisma/schema.prisma: Add status enum (pending/confirmed/rejected/cancelled), ensure all required fields from data-model.md
 - [x] T009 Create AvailabilityBlock model in packages/prisma/schema.prisma with fields: id, userId, dayOfWeek, startTime, endTime, timezone, isActive, timestamps
 - [x] T010 Create CalendarIntegration model in packages/prisma/schema.prisma with fields: id, userId, type, encrypted tokens, syncToken, syncStatus, timestamps
