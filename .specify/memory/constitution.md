@@ -9,7 +9,7 @@
     ✅ .specify/templates/spec-template.md - No constitution-specific references, no changes needed
     ✅ .specify/templates/tasks-template.md - No constitution-specific references, no changes needed
   Follow-up TODOs:
-    - RATIFICATION_DATE: Unknown - marked as TODO
+    - ✅ RATIFICATION_DATE: Set to 2025-12-16
 -->
 
 # Minimal Scheduling Application Constitution
@@ -120,4 +120,4 @@ For runtime development guidance, refer to:
 - `agents/knowledge-base.md` - Domain knowledge and best practices
 - `agents/coding-standards.md` - Coding standards with examples
 
-**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): Unknown - to be determined | **Last Amended**: 2025-12-16
+**Version**: 1.0.0 | **Ratified**: 2025-12-16 | **Last Amended**: 2025-12-16
