@@ -10,11 +10,11 @@ import { BookingForm, type BookingFormValues } from "@calcom/ui/components/booki
 import { Alert } from "@calcom/ui/components/alert";
 
 interface SchedulingPageProps {
-	params: Promise<{ username: string }>;
+	params: Promise<{ user: string }>;
 }
 
 export default function SchedulingPage({ params }: SchedulingPageProps) {
-	const [resolvedParams, setResolvedParams] = useState<{ username: string } | null>(null);
+	const [resolvedParams, setResolvedParams] = useState<{ user: string } | null>(null);
 	const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
 	const [bookingResult, setBookingResult] = useState<{
 		bookingId: string;
@@ -41,7 +41,7 @@ export default function SchedulingPage({ params }: SchedulingPageProps) {
 		}
 	}, []);
 
-	const username = resolvedParams?.username;
+	const username = resolvedParams?.user;
 
 	// Calculate date range (next 30 days)
 	const today = startOfDay(new Date());
