@@ -42,6 +42,9 @@ yarn-error.log*
 !.env.example
 !.env.appStore.example
 
+# credentials
+seed-credentials.md
+
 # vercel
 .vercel
 
