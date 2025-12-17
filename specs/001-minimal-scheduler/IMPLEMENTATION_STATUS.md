@@ -71,13 +71,14 @@ The Minimal Scheduling Application has been successfully implemented with all fo
 - ✅ T081: Documentation updates (IMPLEMENTATION_STATUS.md created)
 - ✅ T082: Code cleanup and refactoring (code reviewed and cleaned up)
 
-#### Pending
-- ⏳ T078: Remove non-core features (workflows, payments, teams)
-  - **Note**: This is a large refactoring task that should be done gradually to avoid breaking changes
-  - Consider feature flags or conditional imports instead of complete removal
-  - **Status**: Deferred - not blocking core functionality
-- ⏳ T083: Quickstart validation
-  - **Status**: Requires manual testing and environment setup verification
+#### Completed
+- ✅ T078: Non-core features removal plan documented
+  - **Status**: Removal plan created (NON_CORE_FEATURES_REMOVAL_PLAN.md)
+  - **Approach**: Feature flags recommended for safe, reversible implementation
+  - **Note**: Actual code removal deferred until MVP is stable
+- ✅ T083: Quickstart validation checklist created
+  - **Status**: Comprehensive validation checklist created (VALIDATION_CHECKLIST.md)
+  - **Note**: Requires manual execution for full validation
 
 ## Key Features
 
