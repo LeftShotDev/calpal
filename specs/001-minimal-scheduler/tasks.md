@@ -93,22 +93,22 @@
 
 ### Implementation for User Story 2
 
-- [ ] T037 [P] [US2] Create CalendarSyncService in packages/features/calendar/services/CalendarSyncService.ts with methods: performIncrementalSync, performFullSync, handleSyncToken
-- [ ] T038 [P] [US2] Create GoogleCalendarClient in packages/lib/calendar/GoogleCalendarClient.ts for Google Calendar API v3 operations (list events, create events, sync token management)
-- [ ] T039 [US2] Implement OAuth2 flow for Google Calendar: Generate auth URL in packages/features/calendar/services/CalendarAuthService.ts (depends on T038)
-- [ ] T040 [US2] Implement OAuth2 callback handler: Exchange code for tokens, store encrypted in packages/features/calendar/services/CalendarAuthService.ts (depends on T038)
-- [ ] T041 [US2] Create calendar.connect tRPC procedure in packages/trpc/server/routers/calendar.ts (depends on T039)
-- [ ] T042 [US2] Create calendar.callback tRPC procedure in packages/trpc/server/routers/calendar.ts (depends on T040)
-- [ ] T043 [US2] Create calendar.getIntegration tRPC procedure in packages/trpc/server/routers/calendar.ts
-- [ ] T044 [US2] Create calendar.disconnect tRPC procedure in packages/trpc/server/routers/calendar.ts
-- [ ] T045 [US2] Create calendar.sync tRPC procedure (manual trigger) in packages/trpc/server/routers/calendar.ts (depends on T037)
-- [ ] T046 [US2] Implement background sync job: Periodic calendar sync every 5 minutes in packages/features/calendar/jobs/syncJob.ts (depends on T037)
-- [ ] T047 [US2] Implement token refresh logic: Auto-refresh expired OAuth tokens in packages/features/calendar/services/CalendarAuthService.ts
-- [ ] T048 [US2] Create calendar integration settings page in apps/web/app/(use-page-wrapper)/(main-nav)/settings/integrations/calendar/page.tsx
-- [ ] T049 [US2] Create calendar connection UI component in packages/ui/components/calendar/CalendarConnection.tsx
-- [ ] T050 [US2] Create calendar sync status display component in packages/ui/components/calendar/SyncStatus.tsx
-- [ ] T051 [US2] Integrate calendar events into availability calculation: Update AvailabilityService.calculateAvailableSlots to exclude CalendarEvent times (depends on T019, T037)
-- [ ] T052 [US2] Implement calendar event cleanup: Remove CalendarEvent records older than 90 days in packages/features/calendar/services/CalendarSyncService.ts
+- [x] T037 [P] [US2] Create CalendarSyncService in packages/features/calendar/services/CalendarSyncService.ts with methods: performIncrementalSync, performFullSync, handleSyncToken
+- [x] T038 [P] [US2] Create GoogleCalendarClient in packages/lib/calendar/GoogleCalendarClient.ts for Google Calendar API v3 operations (list events, create events, sync token management)
+- [x] T039 [US2] Implement OAuth2 flow for Google Calendar: Generate auth URL in packages/features/calendar/services/CalendarAuthService.ts (depends on T038)
+- [x] T040 [US2] Implement OAuth2 callback handler: Exchange code for tokens, store encrypted in packages/features/calendar/services/CalendarAuthService.ts (depends on T038)
+- [x] T041 [US2] Create calendar.connect tRPC procedure in packages/trpc/server/routers/viewer/calendar/_router.tsx (depends on T039)
+- [x] T042 [US2] Create calendar.callback tRPC procedure in packages/trpc/server/routers/viewer/calendar/_router.tsx (depends on T040)
+- [x] T043 [US2] Create calendar.getIntegration tRPC procedure in packages/trpc/server/routers/viewer/calendar/_router.tsx
+- [x] T044 [US2] Create calendar.disconnect tRPC procedure in packages/trpc/server/routers/viewer/calendar/_router.tsx
+- [x] T045 [US2] Create calendar.sync tRPC procedure (manual trigger) in packages/trpc/server/routers/viewer/calendar/_router.tsx (depends on T037)
+- [x] T046 [US2] Implement background sync job: Periodic calendar sync every 5 minutes in packages/features/calendar/jobs/syncJob.ts (depends on T037)
+- [x] T047 [US2] Implement token refresh logic: Auto-refresh expired OAuth tokens in packages/features/calendar/services/CalendarAuthService.ts
+- [x] T048 [US2] Create calendar integration settings page in apps/web/app/(use-page-wrapper)/(main-nav)/settings/integrations/calendar/page.tsx
+- [x] T049 [US2] Create calendar connection UI component in packages/ui/components/calendar/CalendarConnection.tsx
+- [x] T050 [US2] Create calendar sync status display component in packages/ui/components/calendar/SyncStatus.tsx
+- [x] T051 [US2] Integrate calendar events into availability calculation: Update AvailabilityService.calculateAvailableSlots to exclude CalendarEvent times (depends on T019, T037)
+- [x] T052 [US2] Implement calendar event cleanup: Remove CalendarEvent records older than 90 days in packages/features/calendar/services/CalendarSyncService.ts
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently. Calendar integration enables accurate availability display.
 

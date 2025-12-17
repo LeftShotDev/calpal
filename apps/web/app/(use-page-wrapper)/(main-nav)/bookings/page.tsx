@@ -128,12 +128,12 @@ export default function BookingsPage() {
 										<TableCell>
 											<span
 												className={`text-sm font-medium ${booking.status === "confirmed"
-														? "text-green-600"
-														: booking.status === "rejected"
-															? "text-red-600"
-															: booking.status === "pending"
-																? "text-yellow-600"
-																: "text-gray-600"
+													? "text-green-600"
+													: booking.status === "rejected"
+														? "text-red-600"
+														: booking.status === "pending"
+															? "text-yellow-600"
+															: "text-gray-600"
 													}`}
 											>
 												{booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
