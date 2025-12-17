@@ -15,6 +15,38 @@ import logger from "@calcom/lib/logger";
 
 const log = logger.getSubLogger({ prefix: ["MinimalAvailabilityService"] });
 
+// Simple in-memory cache for availability calculations
+interface CacheEntry {
+	data: TimeSlot[];
+	timestamp: number;
+}
+
+const availabilityCache = new Map<string, CacheEntry>();
+const CACHE_TTL_MS = 30 * 1000; // 30 seconds
+
+/**
+ * Get cache key from input parameters
+ */
+function getCacheKey(input: CalculateAvailableSlotsInput): string {
+	return `availability-${input.userId}-${input.startDate.toISOString()}-${input.endDate.toISOString()}-${input.userTimezone}-${input.slotDurationMinutes || 30}`;
+}
+
+/**
+ * Clear cache entries for a specific user (call after booking changes)
+ */
+export function clearAvailabilityCache(userId: number): void {
+	const keysToDelete: string[] = [];
+	Array.from(availabilityCache.keys()).forEach((key) => {
+		if (key.startsWith(`availability-${userId}-`)) {
+			keysToDelete.push(key);
+		}
+	});
+	for (const key of keysToDelete) {
+		availabilityCache.delete(key);
+	}
+	log.debug("Cleared availability cache", { userId, keysCleared: keysToDelete.length });
+}
+
 export interface TimeSlot {
 	startTime: Date; // UTC
 	endTime: Date; // UTC
@@ -36,8 +68,47 @@ export class MinimalAvailabilityService {
 	/**
 	 * Calculate available time slots for a given date range
 	 * Combines availability blocks, calendar events, and bookings
+	 * Results are cached for 30 seconds to reduce database load
 	 */
 	async calculateAvailableSlots(
+		input: CalculateAvailableSlotsInput
+	): Promise<TimeSlot[]> {
+		const cacheKey = getCacheKey(input);
+		const now = Date.now();
+
+		// Check cache
+		const cached = availabilityCache.get(cacheKey);
+		if (cached && now - cached.timestamp < CACHE_TTL_MS) {
+			log.debug("Returning cached availability slots", { userId: input.userId });
+			return cached.data;
+		}
+
+		// Calculate slots
+		const slots = await this._calculateAvailableSlotsInternal(input);
+
+		// Store in cache
+		availabilityCache.set(cacheKey, {
+			data: slots,
+			timestamp: now,
+		});
+
+		// Cleanup old cache entries periodically (every 100 calls)
+		if (availabilityCache.size > 100) {
+			Array.from(availabilityCache.entries()).forEach(([key, entry]) => {
+				if (now - entry.timestamp > CACHE_TTL_MS) {
+					availabilityCache.delete(key);
+				}
+			});
+		}
+
+		return slots;
+	}
+
+	/**
+	 * Internal method that performs the actual calculation
+	 * Separated for caching purposes
+	 */
+	private async _calculateAvailableSlotsInternal(
 		input: CalculateAvailableSlotsInput
 	): Promise<TimeSlot[]> {
 		const { userId, startDate, endDate, userTimezone, slotDurationMinutes = 30 } = input;

@@ -24,6 +24,9 @@ if (!CALENDSO_ENCRYPTION_KEY) {
 	throw new Error("CALENDSO_ENCRYPTION_KEY environment variable is required");
 }
 
+// Type assertion: we've checked above that it exists
+const ENCRYPTION_KEY: string = CALENDSO_ENCRYPTION_KEY;
+
 export interface OAuthTokens {
 	access_token: string;
 	refresh_token?: string;
@@ -97,11 +100,11 @@ export class CalendarAuthService {
 					token_type: tokens.token_type,
 					scope: tokens.scope,
 				}),
-				CALENDSO_ENCRYPTION_KEY
+				ENCRYPTION_KEY
 			);
 
 			const encryptedRefreshToken = tokens.refresh_token
-				? symmetricEncrypt(tokens.refresh_token, CALENDSO_ENCRYPTION_KEY)
+				? symmetricEncrypt(tokens.refresh_token, ENCRYPTION_KEY)
 				: null;
 
 			// Calculate token expiry
@@ -166,7 +169,7 @@ export class CalendarAuthService {
 
 		// Decrypt tokens
 		const decryptedTokens = JSON.parse(
-			symmetricDecrypt(integration.accessToken, CALENDSO_ENCRYPTION_KEY)
+			symmetricDecrypt(integration.accessToken, ENCRYPTION_KEY)
 		) as OAuthTokens;
 
 		const { client_id, client_secret } = await getGoogleAppKeys();
@@ -209,7 +212,7 @@ export class CalendarAuthService {
 			}
 
 			// Decrypt refresh token
-			const refreshToken = symmetricDecrypt(integration.refreshToken, CALENDSO_ENCRYPTION_KEY);
+			const refreshToken = symmetricDecrypt(integration.refreshToken, ENCRYPTION_KEY);
 
 			const { client_id, client_secret } = await getGoogleAppKeys();
 			const oAuth2Client = new OAuth2Client(client_id, client_secret);
@@ -231,11 +234,11 @@ export class CalendarAuthService {
 					token_type: newTokens.token_type,
 					scope: newTokens.scope,
 				}),
-				CALENDSO_ENCRYPTION_KEY
+				ENCRYPTION_KEY
 			);
 
 			const encryptedRefreshToken = newTokens.refresh_token
-				? symmetricEncrypt(newTokens.refresh_token, CALENDSO_ENCRYPTION_KEY)
+				? symmetricEncrypt(newTokens.refresh_token, ENCRYPTION_KEY)
 				: integration.refreshToken; // Keep old if not provided
 
 			const tokenExpiresAt = newTokens.expiry_date

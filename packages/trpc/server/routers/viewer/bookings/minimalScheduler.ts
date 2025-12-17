@@ -138,12 +138,26 @@ export async function approveBookingHandler({
 			uid: input.id,
 			userId: ctx.user.id,
 		},
-		include: {
-			user: {
-				select: {
-					timeZone: true,
-				},
-			},
+		select: {
+			id: true,
+			uid: true,
+			status: true,
+			startTime: true,
+			endTime: true,
+			attendeeName: true,
+			attendeeEmail: true,
+			videoProvider: true,
+			timezone: true,
+			title: true,
+			description: true,
+		},
+	});
+
+	// Get user timezone separately if needed
+	const user = await prisma.user.findUnique({
+		where: { id: ctx.user.id },
+		select: {
+			timeZone: true,
 		},
 	});
 
@@ -197,11 +211,11 @@ export async function approveBookingHandler({
 							description: booking.description || undefined,
 							start: {
 								dateTime: booking.startTime.toISOString(),
-								timeZone: booking.timezone || booking.user?.timeZone || "UTC",
+								timeZone: booking.timezone || user?.timeZone || "UTC",
 							},
 							end: {
 								dateTime: booking.endTime.toISOString(),
-								timeZone: booking.timezone || booking.user?.timeZone || "UTC",
+								timeZone: booking.timezone || user?.timeZone || "UTC",
 							},
 							attendees: booking.attendeeEmail
 								? [
@@ -239,7 +253,7 @@ export async function approveBookingHandler({
 							duration: Math.round(
 								(booking.endTime.getTime() - booking.startTime.getTime()) / (1000 * 60)
 							),
-							timezone: booking.timezone || booking.user?.timeZone || "UTC",
+							timezone: booking.timezone || user?.timeZone || "UTC",
 							zoomAccountId,
 							zoomClientId,
 							zoomClientSecret,

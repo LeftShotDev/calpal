@@ -165,10 +165,10 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T074 [P] Implement data retention job: Auto-delete bookings older than 1 year in packages/features/bookings/jobs/dataRetentionJob.ts
-- [ ] T075 [P] Add error handling and logging across all services (BookingService, AvailabilityService, CalendarSyncService, VideoService)
-- [ ] T076 [P] Optimize database queries: Use Prisma select instead of include, add missing indexes per performance requirements
-- [ ] T077 [P] Implement caching for availability calculations: Cache results for 30 seconds to reduce database load in AvailabilityService
+- [x] T074 [P] Implement data retention job: Auto-delete bookings older than 1 year in packages/features/bookings/jobs/dataRetentionJob.ts
+- [x] T075 [P] Add error handling and logging across all services (BookingService, AvailabilityService, CalendarSyncService, VideoService)
+- [x] T076 [P] Optimize database queries: Use Prisma select instead of include, add missing indexes per performance requirements
+- [x] T077 [P] Implement caching for availability calculations: Cache results for 30 seconds to reduce database load in AvailabilityService
 - [ ] T078 [P] Remove non-core features: Strip workflows, payments, teams, advanced notifications from codebase per FR-021
 - [ ] T079 [P] Optimize bundle size: Remove unused dependencies, implement code splitting, use dynamic imports for heavy components
 - [ ] T080 [P] Performance optimization: Implement ISR for public scheduling pages, optimize React Server Components usage
