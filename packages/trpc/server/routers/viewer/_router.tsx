@@ -15,6 +15,7 @@ import { availabilityRouter } from "./availability/_router";
 import { bookingsRouter } from "./bookings/_router";
 import { calVideoRouter } from "./calVideo/_router";
 import { calendarsRouter } from "./calendars/_router";
+import { calendarRouter } from "./calendar/_router";
 import { credentialsRouter } from "./credentials/_router";
 import { creditsRouter } from "./credits/_router";
 import { delegationCredentialRouter } from "./delegationCredential/_router";
@@ -40,6 +41,7 @@ import { ssoRouter } from "./sso/_router";
 import { viewerTeamsRouter } from "./teams/_router";
 import { travelSchedulesRouter } from "./travelSchedules/_router";
 import { userAdminRouter } from "./users/_router";
+import { videoRouter } from "./video/_router";
 import { webhookRouter } from "./webhook/_router";
 import { workflowsRouter } from "./workflows/_router";
 
@@ -52,6 +54,7 @@ export const viewerRouter = router({
   deploymentSetup: deploymentSetupRouter,
   bookings: bookingsRouter,
   calendars: calendarsRouter,
+  calendar: calendarRouter,
   calVideo: calVideoRouter,
   credentials: credentialsRouter,
   eventTypes: eventTypesRouter,
@@ -88,4 +91,5 @@ export const viewerRouter = router({
   travelSchedules: travelSchedulesRouter,
   aiVoiceAgent: aiVoiceAgentRouter,
   phoneNumber: phoneNumberRouter,
+  video: videoRouter,
 });
