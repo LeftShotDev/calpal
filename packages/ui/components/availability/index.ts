@@ -1,3 +1,3 @@
 export { AvailabilityDisplay } from "./AvailabilityDisplay";
-export type { TimeSlot } from "./AvailabilityDisplay";
-
+export { AvailabilityBlockForm } from "./AvailabilityBlockForm";
+export { AvailabilityBlockList } from "./AvailabilityBlockList";

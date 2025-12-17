@@ -4,13 +4,16 @@ import { ZCalendarOverlayInputSchema } from "./calendarOverlay.schema";
 import { scheduleRouter } from "./schedule/_router";
 import { ZListTeamAvailaiblityScheme } from "./team/listTeamAvailability.schema";
 import { ZUserInputSchema } from "./user.schema";
-
-type AvailabilityRouterHandlerCache = {
-  list?: typeof import("./list.handler").listHandler;
-  user?: typeof import("./user.handler").userHandler;
-  calendarOverlay?: typeof import("./calendarOverlay.handler").calendarOverlayHandler;
-  listTeamAvailability?: typeof import("./team/listTeamAvailability.handler").listTeamAvailabilityHandler;
-};
+import {
+	ZListAvailabilityBlocksInputSchema,
+	ZCreateAvailabilityBlockInputSchema,
+	ZUpdateAvailabilityBlockInputSchema,
+	ZDeleteAvailabilityBlockInputSchema,
+	listAvailabilityBlocksHandler,
+	createAvailabilityBlockHandler,
+	updateAvailabilityBlockHandler,
+	deleteAvailabilityBlockHandler,
+} from "./minimalScheduler";
 
 export const availabilityRouter = router({
   list: authedProcedure.query(async ({ ctx }) => {
@@ -46,4 +49,25 @@ export const availabilityRouter = router({
       input,
     });
   }),
+  // Minimal scheduler availability blocks
+  listBlocks: authedProcedure
+    .input(ZListAvailabilityBlocksInputSchema)
+    .query(async ({ ctx, input }) => {
+      return listAvailabilityBlocksHandler({ ctx, input });
+    }),
+  createBlock: authedProcedure
+    .input(ZCreateAvailabilityBlockInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      return createAvailabilityBlockHandler({ ctx, input });
+    }),
+  updateBlock: authedProcedure
+    .input(ZUpdateAvailabilityBlockInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      return updateAvailabilityBlockHandler({ ctx, input });
+    }),
+  deleteBlock: authedProcedure
+    .input(ZDeleteAvailabilityBlockInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      return deleteAvailabilityBlockHandler({ ctx, input });
+    }),
 });

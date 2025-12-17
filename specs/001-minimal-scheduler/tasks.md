@@ -122,16 +122,16 @@
 
 ### Implementation for User Story 3
 
-- [ ] T053 [P] [US3] Create AvailabilityBlockService in packages/features/availability/services/AvailabilityBlockService.ts with methods: create, update, delete, listByUser
-- [ ] T054 [US3] Create availability.list tRPC procedure in packages/trpc/server/routers/availability.ts (depends on T053)
-- [ ] T055 [US3] Create availability.create tRPC procedure in packages/trpc/server/routers/availability.ts (depends on T053)
-- [ ] T056 [US3] Create availability.update tRPC procedure in packages/trpc/server/routers/availability.ts (depends on T053)
-- [ ] T057 [US3] Create availability.delete tRPC procedure in packages/trpc/server/routers/availability.ts (depends on T053)
-- [ ] T058 [US3] Create availability settings page in apps/web/app/(use-page-wrapper)/(main-nav)/settings/availability/page.tsx
-- [ ] T059 [US3] Create availability block list component in packages/ui/components/availability/AvailabilityBlockList.tsx
-- [ ] T060 [US3] Create availability block form component (create/edit) in packages/ui/components/availability/AvailabilityBlockForm.tsx
-- [ ] T061 [US3] Implement availability block validation: dayOfWeek (0-6), time range, timezone validation in AvailabilityBlockService
-- [ ] T062 [US3] Update AvailabilityService.calculateAvailableSlots to use AvailabilityBlock data (union of overlapping blocks) (depends on T019, T053)
+- [x] T053 [P] [US3] Create AvailabilityBlockService in packages/features/availability/services/AvailabilityBlockService.ts with methods: create, update, delete, listByUser
+- [x] T054 [US3] Create availability.listBlocks tRPC procedure in packages/trpc/server/routers/viewer/availability/_router.tsx (depends on T053)
+- [x] T055 [US3] Create availability.createBlock tRPC procedure in packages/trpc/server/routers/viewer/availability/_router.tsx (depends on T053)
+- [x] T056 [US3] Create availability.updateBlock tRPC procedure in packages/trpc/server/routers/viewer/availability/_router.tsx (depends on T053)
+- [x] T057 [US3] Create availability.deleteBlock tRPC procedure in packages/trpc/server/routers/viewer/availability/_router.tsx (depends on T053)
+- [x] T058 [US3] Create availability settings page in apps/web/app/(use-page-wrapper)/(main-nav)/settings/availability/page.tsx
+- [x] T059 [US3] Create availability block list component in packages/ui/components/availability/AvailabilityBlockList.tsx
+- [x] T060 [US3] Create availability block form component (create/edit) in packages/ui/components/availability/AvailabilityBlockForm.tsx
+- [x] T061 [US3] Implement availability block validation: dayOfWeek (0-6), time range, timezone validation in AvailabilityBlockService
+- [x] T062 [US3] Update AvailabilityService.calculateAvailableSlots to use AvailabilityBlock data (union of overlapping blocks) (depends on T019, T053)
 
 **Checkpoint**: At this point, User Stories 1, 2, AND 3 should all work independently. Admins can configure availability blocks.
 
