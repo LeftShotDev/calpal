@@ -72,13 +72,13 @@
 - [x] T026 [US1] Implement email notification service: Notify admin of pending booking in packages/lib/email/notifications.ts (depends on T017) - Infrastructure complete, email templates pending
 - [x] T027 [US1] Implement email notification service: Send confirmation email when booking approved in packages/lib/email/notifications.ts (depends on T017) - Infrastructure complete, email templates pending
 - [x] T028 [US1] Implement email notification service: Send rejection email when booking rejected in packages/lib/email/notifications.ts (depends on T017) - Infrastructure complete, email templates pending
-- [ ] T029 [US1] Create public scheduling page component in apps/web/app/(use-page-wrapper)/[username]/page.tsx
-- [ ] T030 [US1] Create availability display component in packages/ui/components/availability/AvailabilityDisplay.tsx
-- [ ] T031 [US1] Create booking form component in packages/ui/components/booking/BookingForm.tsx
-- [ ] T032 [US1] Create booking confirmation component (pending state) in packages/ui/components/booking/BookingConfirmation.tsx
-- [ ] T033 [US1] Create admin bookings list page in apps/web/app/(use-page-wrapper)/(main-nav)/bookings/page.tsx
-- [ ] T034 [US1] Create admin booking approval/rejection UI component in packages/ui/components/bookings/BookingActions.tsx
-- [ ] T035 [US1] Add timezone detection and conversion in public scheduling page (client-side) in apps/web/app/(use-page-wrapper)/[username]/page.tsx
+- [x] T029 [US1] Create public scheduling page component in apps/web/app/(use-page-wrapper)/[username]/page.tsx
+- [x] T030 [US1] Create availability display component in packages/ui/components/availability/AvailabilityDisplay.tsx
+- [x] T031 [US1] Create booking form component in packages/ui/components/booking/BookingForm.tsx
+- [x] T032 [US1] Create booking confirmation component (pending state) in packages/ui/components/booking/BookingConfirmation.tsx
+- [x] T033 [US1] Create admin bookings list page in apps/web/app/(use-page-wrapper)/(main-nav)/bookings/page.tsx
+- [x] T034 [US1] Create admin booking approval/rejection UI component in packages/ui/components/bookings/BookingActions.tsx
+- [x] T035 [US1] Add timezone detection and conversion in public scheduling page (client-side) in apps/web/app/(use-page-wrapper)/[username]/page.tsx
 - [x] T036 [US1] Implement double-booking prevention logic in BookingService.createPendingBooking using database transactions
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently. Users can submit bookings, admins can approve/reject, and confirmations are sent.
