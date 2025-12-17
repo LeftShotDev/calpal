@@ -2,12 +2,27 @@
 
 import { format, addDays, startOfDay } from "date-fns";
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 
 import { trpc } from "app/_trpc/trpc";
-import { AvailabilityDisplay, type TimeSlot } from "@calcom/ui/components/availability";
-import { BookingConfirmation } from "@calcom/ui/components/booking";
-import { BookingForm, type BookingFormValues } from "@calcom/ui/components/booking";
 import { Alert } from "@calcom/ui/components/alert";
+
+// Dynamic imports for heavy components to reduce initial bundle size
+const AvailabilityDisplay = dynamic(
+	() => import("@calcom/ui/components/availability/AvailabilityDisplay").then((mod) => ({ default: mod.AvailabilityDisplay })),
+	{ ssr: false }
+);
+const BookingConfirmation = dynamic(
+	() => import("@calcom/ui/components/booking/BookingConfirmation").then((mod) => ({ default: mod.BookingConfirmation })),
+	{ ssr: false }
+);
+const BookingForm = dynamic(
+	() => import("@calcom/ui/components/booking/BookingForm").then((mod) => ({ default: mod.BookingForm })),
+	{ ssr: false }
+);
+
+import type { TimeSlot } from "@calcom/ui/components/availability";
+import type { BookingFormValues } from "@calcom/ui/components/booking";
 
 interface SchedulingPageProps {
 	params: Promise<{ user: string }>;
