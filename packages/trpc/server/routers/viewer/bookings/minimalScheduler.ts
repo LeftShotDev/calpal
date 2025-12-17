@@ -8,6 +8,9 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { BookingStatus } from "@calcom/prisma/enums";
 import { MinimalBookingService } from "@calcom/features/bookings/services/MinimalBookingService";
+import { VideoService } from "@calcom/features/video/services/VideoService";
+import { CalendarAuthService } from "@calcom/features/calendar/services/CalendarAuthService";
+import { GoogleCalendarClient } from "@calcom/lib/calendar/GoogleCalendarClient";
 import { prisma } from "@calcom/prisma";
 import logger from "@calcom/lib/logger";
 
@@ -158,11 +161,11 @@ export async function approveBookingHandler({
 		});
 	}
 
-	// Generate video link if videoProvider is set
+	// Generate video link and create calendar event if videoProvider is set
 	let videoLink: string | undefined;
 	let calendarEventId: string | undefined;
 
-	if (booking.videoProvider === "google-meet") {
+	if (booking.videoProvider) {
 		try {
 			// Get calendar integration
 			const integration = await prisma.calendarIntegration.findFirst({
@@ -174,14 +177,121 @@ export async function approveBookingHandler({
 			});
 
 			if (integration) {
-				// TODO: Create OAuth2Client from integration tokens
-				// For now, we'll skip calendar event creation and video link generation
-				// This will be implemented when calendar integration is complete
-				log.warn("Calendar integration not yet fully implemented for booking approval");
+				const authService = new CalendarAuthService();
+				const videoService = new VideoService();
+
+				// Ensure token is valid
+				await authService.ensureValidToken(integration.id);
+
+				// Get OAuth client
+				const oAuthClient = await authService.getOAuthClient(integration.id);
+				const calendarClient = new GoogleCalendarClient(oAuthClient);
+
+				// Generate video link based on provider
+				if (booking.videoProvider === "google-meet") {
+					// Create calendar event with Google Meet link
+					const calendarEvent = await calendarClient.createEvent(
+						integration.calendarId || "primary",
+						{
+							summary: booking.title || `Meeting with ${booking.attendeeName || "Attendee"}`,
+							description: booking.description || undefined,
+							start: {
+								dateTime: booking.startTime.toISOString(),
+								timeZone: booking.timezone || booking.user?.timeZone || "UTC",
+							},
+							end: {
+								dateTime: booking.endTime.toISOString(),
+								timeZone: booking.timezone || booking.user?.timeZone || "UTC",
+							},
+							attendees: booking.attendeeEmail
+								? [
+										{
+											email: booking.attendeeEmail,
+											displayName: booking.attendeeName || undefined,
+										},
+									]
+								: undefined,
+						},
+						true // Generate Google Meet link
+					);
+
+					calendarEventId = calendarEvent.id;
+					videoLink = calendarEvent.hangoutLink || undefined;
+
+					log.info("Created calendar event with Google Meet link", {
+						bookingId: booking.uid,
+						calendarEventId,
+						videoLink,
+					});
+				} else if (booking.videoProvider === "zoom") {
+					// Generate Zoom link
+					// Note: Zoom credentials should be stored in environment variables or user settings
+					// For now, we'll skip Zoom link generation if credentials aren't available
+					const zoomAccountId = process.env.ZOOM_ACCOUNT_ID;
+					const zoomClientId = process.env.ZOOM_CLIENT_ID;
+					const zoomClientSecret = process.env.ZOOM_CLIENT_SECRET;
+
+					if (zoomAccountId && zoomClientId && zoomClientSecret) {
+						const zoomResult = await videoService.generateLink({
+							provider: "zoom",
+							topic: booking.title || `Meeting with ${booking.attendeeName || "Attendee"}`,
+							startTime: booking.startTime,
+							duration: Math.round(
+								(booking.endTime.getTime() - booking.startTime.getTime()) / (1000 * 60)
+							),
+							timezone: booking.timezone || booking.user?.timeZone || "UTC",
+							zoomAccountId,
+							zoomClientId,
+							zoomClientSecret,
+						});
+
+						if (zoomResult) {
+							videoLink = zoomResult.meetingUrl;
+
+							// Create calendar event with Zoom link
+							const calendarEvent = await calendarClient.createEvent(
+								integration.calendarId || "primary",
+								{
+									summary: booking.title || `Meeting with ${booking.attendeeName || "Attendee"}`,
+									description: `Zoom Meeting: ${videoLink}\n\n${booking.description || ""}`,
+									start: {
+										dateTime: booking.startTime.toISOString(),
+										timeZone: booking.timezone || booking.user?.timeZone || "UTC",
+									},
+									end: {
+										dateTime: booking.endTime.toISOString(),
+										timeZone: booking.timezone || booking.user?.timeZone || "UTC",
+									},
+									attendees: booking.attendeeEmail
+										? [
+												{
+													email: booking.attendeeEmail,
+													displayName: booking.attendeeName || undefined,
+												},
+											]
+										: undefined,
+								},
+								false // Don't generate Google Meet link
+							);
+
+							calendarEventId = calendarEvent.id;
+
+							log.info("Created calendar event with Zoom link", {
+								bookingId: booking.uid,
+								calendarEventId,
+								videoLink,
+							});
+						}
+					} else {
+						log.warn("Zoom credentials not configured, skipping Zoom link generation");
+					}
+				}
+			} else {
+				log.warn("No active calendar integration found for user", { userId: ctx.user.id });
 			}
 		} catch (error) {
 			log.error("Failed to generate video link or create calendar event", { error });
-			// Continue with approval even if video/calendar fails
+			// Continue with approval even if video/calendar fails (graceful degradation)
 		}
 	}
 

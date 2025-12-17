@@ -145,17 +145,17 @@
 
 ### Implementation for User Story 4
 
-- [ ] T063 [P] [US4] Create VideoService in packages/features/video/services/VideoService.ts with methods: generateGoogleMeetLink, generateZoomLink
-- [ ] T064 [P] [US4] Implement Google Meet link generation: Use Google Calendar API conferenceData when creating calendar events in packages/features/video/services/GoogleMeetService.ts
-- [ ] T065 [P] [US4] Create Zoom API client for Server-to-Server OAuth in packages/lib/video/ZoomClient.ts
-- [ ] T066 [US4] Implement Zoom link generation: Create Zoom meeting via API in packages/features/video/services/ZoomService.ts (depends on T065)
-- [ ] T067 [US4] Create video.generateGoogleMeetLink tRPC procedure in packages/trpc/server/routers/video.ts (depends on T064)
-- [ ] T068 [US4] Create video.generateZoomLink tRPC procedure in packages/trpc/server/routers/video.ts (depends on T066)
-- [ ] T069 [US4] Integrate video link generation into booking approval flow: Generate link when booking approved in BookingService.approveBooking (depends on T018, T063)
-- [ ] T070 [US4] Add video provider selection to booking form in packages/ui/components/booking/BookingForm.tsx
-- [ ] T071 [US4] Display video link in booking confirmation email template in packages/lib/email/templates/bookingConfirmation.tsx
-- [ ] T072 [US4] Include video link in Google Calendar event when creating calendar event in CalendarSyncService (depends on T037, T063)
-- [ ] T073 [US4] Handle video API failures gracefully: Booking completes without video link if API fails in VideoService methods
+- [x] T063 [P] [US4] Create VideoService in packages/features/video/services/VideoService.ts with methods: generateGoogleMeetLink, generateZoomLink
+- [x] T064 [P] [US4] Implement Google Meet link generation: Use Google Calendar API conferenceData when creating calendar events in packages/features/video/services/GoogleMeetService.ts
+- [x] T065 [P] [US4] Create Zoom API client for Server-to-Server OAuth in packages/lib/video/ZoomClient.ts
+- [x] T066 [US4] Implement Zoom link generation: Create Zoom meeting via API in packages/features/video/services/ZoomService.ts (depends on T065)
+- [x] T067 [US4] Create video.generateGoogleMeetLink tRPC procedure in packages/trpc/server/routers/viewer/video/_router.tsx (depends on T064)
+- [x] T068 [US4] Create video.generateZoomLink tRPC procedure in packages/trpc/server/routers/viewer/video/_router.tsx (depends on T066)
+- [x] T069 [US4] Integrate video link generation into booking approval flow: Generate link when booking approved in BookingService.approveBooking (depends on T018, T063)
+- [x] T070 [US4] Add video provider selection to booking form in packages/ui/components/booking/BookingForm.tsx
+- [x] T071 [US4] Display video link in booking confirmation email template in packages/lib/email/templates/bookingConfirmation.tsx
+- [x] T072 [US4] Include video link in Google Calendar event when creating calendar event in CalendarSyncService (depends on T037, T063)
+- [x] T073 [US4] Handle video API failures gracefully: Booking completes without video link if API fails in VideoService methods
 
 **Checkpoint**: All user stories should now be independently functional. Video conferencing enhances the scheduling experience.
 

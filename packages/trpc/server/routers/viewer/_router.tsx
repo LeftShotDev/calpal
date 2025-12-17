@@ -41,6 +41,7 @@ import { ssoRouter } from "./sso/_router";
 import { viewerTeamsRouter } from "./teams/_router";
 import { travelSchedulesRouter } from "./travelSchedules/_router";
 import { userAdminRouter } from "./users/_router";
+import { videoRouter } from "./video/_router";
 import { webhookRouter } from "./webhook/_router";
 import { workflowsRouter } from "./workflows/_router";
 
@@ -90,4 +91,5 @@ export const viewerRouter = router({
   travelSchedules: travelSchedulesRouter,
   aiVoiceAgent: aiVoiceAgentRouter,
   phoneNumber: phoneNumberRouter,
+  video: videoRouter,
 });
